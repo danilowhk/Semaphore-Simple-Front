@@ -46,7 +46,7 @@ export default function Home() {
   const admin = '0xd770134156f9aB742fDB4561A684187f733A9586';
   const signal = "Hello ZK";
   const signalBytes32 = ethers.utils.formatBytes32String(signal);
-  const groupId = 7537;
+  const groupId = 7579;
   let zeroValue = 0;
 
   function generateNewId(){
@@ -79,25 +79,26 @@ export default function Home() {
   }
 
   async function generateProofGroup1(){
+
     const externalNullifier = group1.root
 
     const fullProof = await generateProof(identity, group1, externalNullifier, signal, {
-      zkeyFilePath: "https://www.trusted-setup-pse.org/semaphore/20/semaphore.zkey",
-      wasmFilePath: "https://www.trusted-setup-pse.org/semaphore/20/semaphore.wasm"
+      zkeyFilePath: "./semaphore.zkey",
+      wasmFilePath: "./semaphore.wasm"
     })
 
-    const { nullifierHash } = fullProof.publicSignals
+    // const { nullifierHash } = fullProof.publicSignals
     const solidityProof = packToSolidityProof(fullProof.proof)
 
     setGroup1Proof(fullProof);
-    setGroup1NullifierHash(nullifierHash);
+    // setGroup1NullifierHash(nullifierHash);
     setGroup1SolidityProof(solidityProof);
     setGroup1ExternalNullifier(externalNullifier);
   }
 
   async function verifyProofGroup1(){
    
-    const verificationKey = await fetch("https://www.trusted-setup-pse.org/semaphore/20/semaphore.json").then(function(res) {
+    const verificationKey = await fetch("http://localhost:3000/semaphore.json").then(function(res) {
       return res.json();
     });
 
@@ -112,22 +113,41 @@ export default function Home() {
   async function addGroupOnChain(){
     console.log("Create Group Tx")
 
-    const createGroup = await semaphoreContract.createGroup(groupId,depth,0,admin);
+    // const group2 = new Group()
+
+    const createGroup = await semaphoreContract.createGroup(groupId,20,0,admin);
     const tx = await createGroup.wait()
+    console.log(identityCommitment);
+
+    const addMember = await semaphoreContract.addMember(groupId,identityCommitment);
+    const tx2 = await addMember.wait()
 
     console.log(tx);
     console.log(tx.transactionHash);
+    console.log(tx2.transactionHash);
     setCreateGroupTx(tx.transactionHash);
+
   }
 
   async function verifyIdentityOnChain(){
     console.log("On Chain Verification Tx");
 
-    const checkMembership = await semaphoreContract.verifyProof(groupId,signalBytes32,group1NullifierHash,group1ExternalNullifier,group1SolidityProof,{gasLimit: 1500000});
+    const externalNullifier = 1000000000;
+
+    const fullProof2 = await generateProof(identity, group1, externalNullifier, signal, {
+      zkeyFilePath: "./semaphore.zkey",
+      wasmFilePath: "./semaphore.wasm"
+    })
+
+    const { nullifierHash } = fullProof2.publicSignals
+    const solidityProof2 = packToSolidityProof(fullProof2.proof)
+    console.log(solidityProof2);
+
+    const checkMembership = await semaphoreContract.verifyProof(groupId,signalBytes32,nullifierHash,externalNullifier,solidityProof2,{gasLimit: 1500000});
     const tx = await checkMembership.wait();
 
     console.log(tx);
-    setVerifyOnChainTx(tx.hash);
+    setVerifyOnChainTx(tx.transactionHash);
 
   }
 
