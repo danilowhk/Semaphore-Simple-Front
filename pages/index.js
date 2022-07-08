@@ -82,8 +82,8 @@ export default function Home() {
     const externalNullifier = group1.root
 
     const fullProof = await generateProof(identity, group1, externalNullifier, signal, {
-      zkeyFilePath: "http://localhost:3000/semaphore.zkey",
-      wasmFilePath: "http://localhost:3000/semaphore.wasm"
+      zkeyFilePath: "https://www.trusted-setup-pse.org/semaphore/20/semaphore.zkey",
+      wasmFilePath: "https://www.trusted-setup-pse.org/semaphore/20/semaphore.wasm"
     })
 
     const { nullifierHash } = fullProof.publicSignals
@@ -97,7 +97,7 @@ export default function Home() {
 
   async function verifyProofGroup1(){
    
-    const verificationKey = await fetch("http://localhost:3000/semaphore.json").then(function(res) {
+    const verificationKey = await fetch("https://www.trusted-setup-pse.org/semaphore/20/semaphore.json").then(function(res) {
       return res.json();
     });
 
