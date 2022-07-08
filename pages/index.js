@@ -46,7 +46,7 @@ export default function Home() {
   const admin = '0xd770134156f9aB742fDB4561A684187f733A9586';
   const signal = "Hello ZK";
   const signalBytes32 = ethers.utils.formatBytes32String(signal);
-  const groupId = 7534;
+  const groupId = 7537;
   let zeroValue = 0;
 
   function generateNewId(){
@@ -80,7 +80,6 @@ export default function Home() {
 
   async function generateProofGroup1(){
     const externalNullifier = group1.root
-    const signal = '0x61626364';
 
     const fullProof = await generateProof(identity, group1, externalNullifier, signal, {
       zkeyFilePath: "http://localhost:3000/semaphore.zkey",
